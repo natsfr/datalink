@@ -15,7 +15,6 @@ def CAWGN(power, length):
 def polymul(poly0, poly1):
     a = poly1
     b = poly0
-    print(a)
     if(len(poly0) >= len(poly1)):
         a = poly0
         b = poly1
@@ -36,7 +35,21 @@ def polymod(poly, mod):
     remainder = []
     for i in np.arange(mod,len(poly)):
         remainder.append(poly[i])
-    mlen = len(remainder)
+    mlen = min(len(remainder), mod)
+    final = []
     for i in np.arange(mlen):
-        remainder[i] += poly[i]
-    return remainder
+        final.append(remainder[i] + poly[i])
+    return final
+
+# Coef need to be set in the LSB first
+def binarypolymul(poly0, poly1, polysize, modulo):
+    # Dumb method
+    p0 = np.zeros(polysize);
+    p1 = np.zeros(polysize);
+    for i in np.arange(len(poly0)):
+        p0[i] = poly0[i]
+    for i in np.arange(len(poly1)):
+        p1[i] = poly1[i]
+    arbmul = polymul(p0, p1)
+    arbmul = GF2poly(arbmul)
+    return GF2poly(polymod(arbmul, modulo))
