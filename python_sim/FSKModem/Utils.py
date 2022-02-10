@@ -25,3 +25,18 @@ def polymul(poly0, poly1):
             if a[j] != 0 and b[i] != 0: # X^(i+j) = a[j] * b[i]
                 result[i+j] += a[j] * b[i]
     return result
+
+def GF2poly(poly):
+    gf2poly = []
+    for i in np.arange(len(poly)):
+        gf2poly.append(np.mod(poly[i], 2))
+    return gf2poly
+
+def polymod(poly, mod):
+    remainder = []
+    for i in np.arange(mod,len(poly)):
+        remainder.append(poly[i])
+    mlen = len(remainder)
+    for i in np.arange(mlen):
+        remainder[i] += poly[i]
+    return remainder

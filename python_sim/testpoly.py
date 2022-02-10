@@ -16,3 +16,9 @@ poly1.reverse()
 
 res = FSKUtils.polymul(poly0, poly1)
 res.reverse()
+
+res = FSKUtils.GF2poly(res)
+
+modulo = FSKUtils.polymod(res, 5)
+
+final_result = FSKUtils.GF2poly(modulo)
