@@ -7,6 +7,7 @@ Created on Mon Feb 14 01:36:28 2022
 """
 
 from FSKModem import SeqUtils as SeqUtils
+from FSKModem import FSKModem as FMod
 
 import numpy as np
 
@@ -16,8 +17,8 @@ seq0 = 0x00
 seq1 = 0x00
 
 hamArray = np.zeros((2**seqSize, 2**seqSize))
-peakCorrArray = np.zeros((2**seqSize, 2**seqSize))
-absCorrArray = np.zeros((2**seqSize, 2**seqSize))
+#peakCorrArray = np.zeros((2**seqSize, 2**seqSize))
+#absCorrArray = np.zeros((2**seqSize, 2**seqSize))
 
 for i in np.arange(2 ** seqSize):
     for j in np.arange(2 ** seqSize):
@@ -26,3 +27,17 @@ for i in np.arange(2 ** seqSize):
         #absCorrArray[i,j] = absCorr(seq0, seq1, seqSize)
         seq1 += 1
     seq0 += 1
+    
+modem = FMod.FSKModem(4, 10e3, 25e3, 2, 0)
+nbSample = modem.symLen * seqSize
+
+modulatedArray = np.zeros((2**seqSize,nbsample))
+
+for i in np.arange(2 ** seqSize):
+    for j in np.arange(2 ** seqSize):
+        hamArray[i,j] = SeqUtils.hamDist(seq0, seq1, seqSize)
+        #peakCorrArray[i,j] = peakCorr(seq0, seq1, seqSize)
+        #absCorrArray[i,j] = absCorr(seq0, seq1, seqSize)
+        seq1 += 1
+    seq0 += 1
+    
