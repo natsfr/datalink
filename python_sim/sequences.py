@@ -17,27 +17,27 @@ seq0 = 0x00
 seq1 = 0x00
 
 hamArray = np.zeros((2**seqSize, 2**seqSize))
-#peakCorrArray = np.zeros((2**seqSize, 2**seqSize))
-#absCorrArray = np.zeros((2**seqSize, 2**seqSize))
 
 for i in np.arange(2 ** seqSize):
     for j in np.arange(2 ** seqSize):
         hamArray[i,j] = SeqUtils.hamDist(seq0, seq1, seqSize)
-        #peakCorrArray[i,j] = peakCorr(seq0, seq1, seqSize)
-        #absCorrArray[i,j] = absCorr(seq0, seq1, seqSize)
         seq1 += 1
     seq0 += 1
     
 modem = FMod.FSKModem(4, 10e3, 25e3, 2, 0)
-nbSample = modem.symLen * seqSize
+nbSample = int(modem.symLen * seqSize)
 
-modulatedArray = np.zeros((2**seqSize,nbsample))
+modulatedArray = []
+seqMod = 0x00
 
 for i in np.arange(2 ** seqSize):
-    for j in np.arange(2 ** seqSize):
-        hamArray[i,j] = SeqUtils.hamDist(seq0, seq1, seqSize)
-        #peakCorrArray[i,j] = peakCorr(seq0, seq1, seqSize)
-        #absCorrArray[i,j] = absCorr(seq0, seq1, seqSize)
-        seq1 += 1
-    seq0 += 1
+    seqList = [int(x) for x in "{:08b}".format(seqMod)]
+    print(seqList)
+    modulatedArray.append(modem.modulateDiff(seqList)[0])
+    seqMod += 1
     
+corrArray = np.zeros((2**seqSize,2**seqSize))
+for i in np.arange(2 ** seqSize):
+    for j in np.arange(2 ** seqSize):
+        corr = np.correlate(modulatedArray[i], modulatedArray[j])
+        corrArray[i,j] = corr[0] ** 2

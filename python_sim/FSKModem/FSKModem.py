@@ -39,6 +39,7 @@ class FSKModem:
         
     # Modulate some kind of differential FSK for treillis demod
     def modulateDiff(self, bitstream):
+        print("Type of bitstream: ", type(bitstream))
         stone, stoneFreq = self.tones[self.startSym]
         signal = np.array(stone)
         tree = [self.startSym]
