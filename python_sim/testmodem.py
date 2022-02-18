@@ -20,12 +20,14 @@ ax.plot(scale,spectre)
 ax.grid(True)
 plt.show()
 
-noise = FSKUtils.CAWGN(0.5, (len(bitstream)+1)*modem.symLen)
+# noise = FSKUtils.CAWGN(0.5, (len(bitstream)+1)*modem.symLen)
 
-signoise = noise + signal
+# signoise = noise + signal
 
-spectre = 20*np.log10(fft.fftshift(np.abs(fft.fft(signoise))))
-fig, ax = plt.subplots()
-ax.plot(scale,spectre)
-ax.grid(True)
-plt.show()
+# spectre = 20*np.log10(fft.fftshift(np.abs(fft.fft(signoise))))
+# fig, ax = plt.subplots()
+# ax.plot(scale,spectre)
+# ax.grid(True)
+# plt.show()
+
+demodsig = modem.demodAligned(signal)
