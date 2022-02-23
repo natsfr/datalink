@@ -61,3 +61,26 @@ class FSKModem:
             signal = np.append(signal, tone * delay)
             tree.append(currentSym)
         return (signal,tree)
+    
+    # Demod perfectly aligned signal
+    def demodAligned(self, signal):
+        nbSym = int(len(signal) / self.symLen)
+        offset = int(self.symLen/2)
+        centerPoint = np.zeros(nbSym, dtype = complex)
+        for i in np.arange(nbSym):
+            centerPoint[i] = signal[offset + i*int(self.symLen)]
+        return centerPoint
+
+    # Generate noise of right power corresponding to EB/NO ratio
+    # Signal power is the reference set to 1
+    # SNR = Psig / Pnoise
+    # Psig = Eb /Tb = Eb * DR
+    # Pnoise = N0 * BW
+    def ebno2np(self, ratio):
+        Eb = self.Tsym
+        N0 = Eb / ratio
+        Pnoise = N0 * self.BW
+        print("Eb: ", Eb)
+        print("N0: ", N0)
+        print("Noise Power: ", Pnoise)
+        return Pnoise
