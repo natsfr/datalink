@@ -6,9 +6,20 @@ import numpy.fft as fft
  
 import matplotlib.pyplot as plt
 
-modem = FMod.FSKModem(4, 15e3, 25e3, 1, 0)
-bitstream = [0,1,1,1,0,1,1,1,1,0,0,1,1,0,1,0]
+modem = FMod.FSKModem(4, 10e3, 15e3, 1, 0)
+print("FSK Modem:")
+print("Tones: ", modem.nbTones)
+print("Tone Spacing: ", modem.toneSpacing)
+print("Bandwidth: ", modem.BW)
+print("Datarate: ", modem.DR)
+print("Tones frequency: ", [x[1] for x in modem.tones])
+print("Symbol length: ", modem.symLen)
+print("Starting symbol: ", modem.startSym)
+print("Sampling frequency: ", modem.FS)
+# bitstream = [0,1,1,1,0,1,1,1,1,0,0,1,1,0,1,0]
+bitstream = [0,1,1,1,0,1,1,1]
 signal,tree = modem.modulateDiff(bitstream)
+print("Frequencies tree: ", tree)
 
 tones = modem.tones
 T0, T0freq = tones[0]
@@ -41,18 +52,18 @@ X, Y = np.meshgrid(x,y)
 
 F = X**2 + Y**2 - 1.0
 
-demodsig = modem.demodAligned(signal+noise)
+#demodsign = modem.demodAligned(signal+noise)
+#demodsig = modem.demodAligned(signal)
+demodsig = modem.demodAlignedCorr(signal)
 nsig = signal + noise
 fig, ax = plt.subplots()
 plt.ion()
 ax.contour(X,Y,F,[0])
 ax.scatter(signal.real, signal.imag, label="All signal points")
-ax.scatter(nsig.real, nsig.imag, label="All noisy signal points")
+#ax.scatter(nsig.real, nsig.imag, label="All noisy signal points")
+#ax.scatter(demodsign.real, demodsign.imag, marker="v", label="Symbol Centered Points With noise")
 ax.scatter(demodsig.real, demodsig.imag, marker="v", label="Symbol Centered Points")
 ax.grid(True)
 ax.legend()
 plt.show()
 
-
-
-input()

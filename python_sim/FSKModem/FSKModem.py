@@ -33,13 +33,12 @@ class FSKModem:
         self.tones = []
         startToneFreq = -1 * self.toneSpacing * ((self.nbTones / 2 - 1) + 1/2)
         for i in np.arange(self.nbTones):
-            s = np.exp(-1j * 2 * np.pi * startToneFreq / self.FS * self.n)
+            s = np.exp(1j * 2 * np.pi * startToneFreq / self.FS * self.n)
             self.tones.append((s, startToneFreq))
             startToneFreq += self.toneSpacing
         
     # Modulate some kind of differential FSK for treillis demod
     def modulateDiff(self, bitstream):
-        print("Type of bitstream: ", type(bitstream))
         stone, stoneFreq = self.tones[self.startSym]
         signal = np.array(stone)
         tree = [self.startSym]
@@ -65,11 +64,27 @@ class FSKModem:
     # Demod perfectly aligned signal
     def demodAligned(self, signal):
         nbSym = int(len(signal) / self.symLen)
-        offset = int(self.symLen/2)
+        offset = int(self.symLen/2)  # needs alignment
         centerPoint = np.zeros(nbSym, dtype = complex)
+        
+        print("Demod nbSym: ", nbSym)
+        
         for i in np.arange(nbSym):
             centerPoint[i] = signal[offset + i*int(self.symLen)]
         return centerPoint
+    
+    def demodAlignedCorr(self, signal):
+        nbSym = int(len(signal)/self.symLen)
+        sTones = [x[0] for x in self.tones]
+        corrs = []
+        for s in sTones:
+            toneCorr = []
+            for i in np.arange(nbSym):
+                sigPart = signal[i*nbSym:i*nbSym+nbSym-1]
+                toneCorr.append(np.correlate(sigPart, s, 'valid'))
+                print("Len: ", len(sigPart), " ", len(s))
+            corrs.append(toneCorr)
+        return corrs
 
     # Generate noise of right power corresponding to EB/NO ratio
     # Signal power is the reference set to 1
