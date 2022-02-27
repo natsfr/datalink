@@ -75,15 +75,18 @@ class FSKModem:
     
     def demodAlignedCorr(self, signal):
         nbSym = int(len(signal)/self.symLen)
+        symLen = int(self.symLen)
         sTones = [x[0] for x in self.tones]
-        corrs = []
-        for s in sTones:
-            toneCorr = []
+        corrs = np.zeros((len(sTones), nbSym), dtype='complex')
+        print("SIgnal length: ", len(signal), " Nb Sym: ", nbSym)
+        for s in np.arange(len(sTones)):
             for i in np.arange(nbSym):
-                sigPart = signal[i*nbSym:i*nbSym+nbSym-1]
-                toneCorr.append(np.correlate(sigPart, s, 'valid'))
-                print("Len: ", len(sigPart), " ", len(s))
-            corrs.append(toneCorr)
+                sigPart = signal[i*symLen:i*symLen+symLen]
+                sigRef = sTones[s]
+                print("I start: ", i*symLen, " I stop: ", i*symLen+symLen-1, " Correlation: ", np.correlate(sigPart, sigRef, 'valid'))
+                print("Len: ", len(sigPart), " ", len(sigRef))
+                corrs[s][i] = (np.correlate(sigPart, sigRef, 'valid'))
+
         return corrs
 
     # Generate noise of right power corresponding to EB/NO ratio
