@@ -9,7 +9,7 @@ import numpy as np
 
 class FSKModem:
     
-    def __init__(self, nbTones, DR, toneSpacing, overSample, startSymbol):
+    def __init__(self, nbTones, DR, toneSpacing, overSample, startSymbol, syncPattern):
         self.nbTones = nbTones
         self.DR = DR
         self.toneSpacing = toneSpacing
@@ -28,6 +28,8 @@ class FSKModem:
         self.createTonesTable()
         
         self.startSym = startSymbol
+        
+        self.syncPattern = syncPattern
         
     def createTonesTable(self):
         self.tones = []
@@ -61,33 +63,28 @@ class FSKModem:
             tree.append(currentSym)
         return (signal,tree)
     
-    # Demod perfectly aligned signal
-    def demodAligned(self, signal):
-        nbSym = int(len(signal) / self.symLen)
-        offset = int(self.symLen/2)  # needs alignment
-        centerPoint = np.zeros(nbSym, dtype = complex)
-        
-        print("Demod nbSym: ", nbSym)
-        
-        for i in np.arange(nbSym):
-            centerPoint[i] = signal[offset + i*int(self.symLen)]
-        return centerPoint
-    
     def demodAlignedCorr(self, signal):
         nbSym = int(len(signal)/self.symLen)
         symLen = int(self.symLen)
         sTones = [x[0] for x in self.tones]
         corrs = np.zeros((len(sTones), nbSym), dtype='complex')
-        print("SIgnal length: ", len(signal), " Nb Sym: ", nbSym)
+        #print("SIgnal length: ", len(signal), " Nb Sym: ", nbSym)
         for s in np.arange(len(sTones)):
             for i in np.arange(nbSym):
                 sigPart = signal[i*symLen:i*symLen+symLen]
                 sigRef = sTones[s]
-                print("I start: ", i*symLen, " I stop: ", i*symLen+symLen-1, " Correlation: ", np.correlate(sigPart, sigRef, 'valid'))
-                print("Len: ", len(sigPart), " ", len(sigRef))
+                #print("I start: ", i*symLen, " I stop: ", i*symLen+symLen-1, " Correlation: ", np.correlate(sigPart, sigRef, 'valid'))
+                #print("Len: ", len(sigPart), " ", len(sigRef))
                 corrs[s][i] = (np.correlate(sigPart, sigRef, 'valid'))
-
         return corrs
+    
+    # Try to find beginning of stream
+    def alignStream(self, signal, threshold):
+        lenSync = len(self.syncPattern)
+        pattern = self.modulateDiff(self.syncPattern)
+        
+        
+        return startIndex
 
     # Generate noise of right power corresponding to EB/NO ratio
     # Signal power is the reference set to 1

@@ -52,8 +52,6 @@ X, Y = np.meshgrid(x,y)
 
 F = X**2 + Y**2 - 1.0
 
-#demodsign = modem.demodAligned(signal+noise)
-#demodsig = modem.demodAligned(signal)
 demodsig = modem.demodAlignedCorr(signal)
 nsig = signal + noise
 demodnoisesig = modem.demodAlignedCorr(nsig)
