@@ -30,6 +30,7 @@ class FSKModem:
         self.startSym = startSymbol
         
         self.syncPattern = syncPattern
+        self.syncSig = self.modulateDiff(syncPattern)
         
     def createTonesTable(self):
         self.tones = []
@@ -77,6 +78,19 @@ class FSKModem:
                 #print("Len: ", len(sigPart), " ", len(sigRef))
                 corrs[s][i] = (np.correlate(sigPart, sigRef, 'valid'))
         return corrs
+    
+    # Unfinished find best probabilities by iterative method
+    def getProbabilities(self, corrSeq):
+        probTree = np.zeros(np.shape(corrSeq))
+        for i in np.arange(np.shape(corrSeq)[1]):
+            colTotal = np.sum(corrSeq[:,i])
+            for j in np.arange(np.shape(corrSeq)[0]):
+                probTree[j,i] = corrSeq[j, i] / colTotal
+        return probTree
+    
+    def bruteForceSeq(self, signal):
+        nbSym = int(len(signal)/self.symLen)
+        symLen = int(self.symLen)
     
     # Try to find beginning of stream
     def alignStream(self, signal, threshold):
