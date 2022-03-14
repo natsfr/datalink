@@ -39,13 +39,20 @@ class FSKModem:
             s = np.exp(1j * 2 * np.pi * startToneFreq / self.FS * self.n)
             self.tones.append((s, startToneFreq))
             startToneFreq += self.toneSpacing
-        
+    
+    def bitfield(self, n, len):
+        return [int(digit) for digit in bin(n)[2:].zfill(len)]
+
     # Modulate some kind of differential FSK for treillis demod
     def modulateDiff(self, bitstream):
         stone, stoneFreq = self.tones[self.startSym]
-        signal = np.array(stone)
-        tree = [self.startSym]
-        runTime = self.Tsym * stoneFreq
+        #signal = np.array(stone)
+        #tree = [self.startSym]
+        #runTime = self.Tsym * stoneFreq
+        # Trying implicit start Symbol
+        signal = np.empty(shape=(0,0), dtype='complex')
+        tree = []
+        runTime = 0
         currentSym = self.startSym
         for b in bitstream:
             if b == 1:
@@ -91,6 +98,14 @@ class FSKModem:
     def bruteForceSeq(self, signal):
         nbSym = int(len(signal)/self.symLen)
         symLen = int(self.symLen)
+        seed = 0
+        seqs = []
+        detectSeq = []
+        for i in np.arange(2**nbSym):
+            seqs.append(self.modulateDiff(self.bitfield(seed, nbSym))[0])
+            seed = seed + 1
+            detectSeq.append(np.correlate(signal, seqs[i], 'valid')[0])
+        return detectSeq
     
     # Try to find beginning of stream
     def alignStream(self, signal, threshold):

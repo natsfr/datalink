@@ -41,7 +41,7 @@ scale = np.linspace(T0freq * modem.overSample, T3freq * modem.overSample, int((l
 # ax.grid(True)
 # plt.show()
 
-Pnoise = modem.ebno2np(10)
+Pnoise = modem.ebno2np(1)
 noise = FSKUtils.CAWGN(Pnoise, len(signal))
 
 # Create circle
@@ -70,3 +70,5 @@ demodAmp = np.absolute(demodsig)
 demodNoiseAmp = np.absolute(demodnoisesig)
     
 test = modem.getProbabilities(demodNoiseAmp)
+brutTest = modem.bruteForceSeq(nsig)
+print("Original bitstream: ", bitstream, " recovered data: ", modem.bitfield(brutTest.index(max(brutTest)), 8))
