@@ -6,7 +6,7 @@ import numpy.fft as fft
  
 import matplotlib.pyplot as plt
 
-modem = FMod.FSKModem(4, 50e3, 25e3, 1, 0, [0, 1, 0, 1, 1, 1 ,0])
+modem = FMod.FSKModem(4, 10e3, 25e3, 1, 0, [0, 1, 0, 1, 1, 1 ,0])
 print("FSK Modem:")
 print("Tones: ", modem.nbTones)
 print("Tone Spacing: ", modem.toneSpacing)

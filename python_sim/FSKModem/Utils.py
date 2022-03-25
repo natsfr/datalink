@@ -10,7 +10,7 @@ import numpy as np
 import numpy.random as rnd
 
 def CAWGN(power, length):
-    return power * np.sqrt(2)/2 *(rnd.randn(int((length))) + 1j * rnd.randn(int(length)));
+    return np.sqrt(power) * np.sqrt(2)/2 *(rnd.randn(int((length))) + 1j * rnd.randn(int(length)));
 
 def polymul(poly0, poly1):
     a = poly1

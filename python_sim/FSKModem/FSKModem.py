@@ -123,8 +123,8 @@ class FSKModem:
     def ebno2np(self, ratio):
         Eb = self.Tsym
         N0 = Eb / ratio
-        Pnoise = N0 * self.BW
-        print("Eb: ", Eb)
-        print("N0: ", N0)
-        print("Noise Power: ", Pnoise)
+        Pnoise = N0 * self.BW * (self.FS) / self.BW
+        #print("Eb: ",Eb)
+        #print("N0: ", N0)
+        #print("Noise Power: ", Pnoise)
         return Pnoise

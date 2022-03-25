@@ -24,7 +24,7 @@ for i in np.arange(2 ** seqSize):
         seq1 += 1
     seq0 += 1
     
-modem = FMod.FSKModem(4, 10e3, 25e3, 2, 0)
+modem = FMod.FSKModem(4, 10e3, 25e3, 2, 0, [0, 1, 0, 1, 1, 1 ,0])
 nbSample = int(modem.symLen * seqSize)
 
 modulatedArray = []
