@@ -31,14 +31,16 @@ nbThread = 0
 thLim = 12
 tList = [0] * thLim
 for i  in np.arange(2**seqSize):
-    print("Sequence: ", i)
+    # print("Sequence: ", i)
+    # print("nbThread: ", nbThread)
     tList[nbThread] = Thread(target=hamstore, args=(i, ))
     nbThread = nbThread + 1
     tList[nbThread-1].start()
-    if nbThread == 12:
+    if nbThread == thLim:
         for j in np.arange(thLim):
             tList[j].join()
         nbThread = 0
+        print("Sequence: ", i)
 
 nbValidSeq = 2**8
 bestSeqs = np.zeros(2**8)

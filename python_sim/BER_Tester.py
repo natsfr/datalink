@@ -22,7 +22,7 @@ def BERDiff(bs, rxbs):
         return errCount
     return 0
 
-modem = FMod.FSKModem(4, 50e3, 25e3, 1, 0, [0, 1, 0, 1, 1, 1 ,0])
+modem = FMod.FSKModem(4, 25e3, 25e3, 1, 0, [0, 1, 0, 1, 1, 1 ,0], 1)
 print("FSK Modem:")
 print("Tones: ", modem.nbTones)
 print("Tone Spacing: ", modem.toneSpacing)
@@ -37,6 +37,20 @@ print("Sampling frequency: ", modem.FS)
 perList = []
 berList = []
 
+# Activte frequency shift
+shift = True
+freqShift = 500 # Hz
+
+# Generate all sequences in advance
+sigList = []
+for i in np.arange(256):
+    bs = modem.bitfield(i, 8)
+    sig,tree = modem.modulateDiff(bs, freqShift)
+    sigList.append(sig)
+    
+# Generate same sequences in Modem object
+modem.fillRefSeq(8)
+
 for i in np.arange(0, 15):
     dBRatio = i
     linRatio = 10 ** (dBRatio / 10)
@@ -44,13 +58,15 @@ for i in np.arange(0, 15):
     
     nbPERErr = 0
     nbBERErr = 0
-    nbIter = 500
+    nbIter = 5000
+    
+    ebno_level = modem.ebno2np(linRatio)
+    
     for j in np.arange(0, nbIter):
         bsbin = np.random.randint(0,255,dtype=np.uint8)
-        bs = modem.bitfield(bsbin, 8)
+        sig = sigList[bsbin]
         
-        sig,tree = modem.modulateDiff(bs)
-        noise = FSKUtils.CAWGN(modem.ebno2np(linRatio), len(sig))
+        noise = FSKUtils.CAWGN(ebno_level, len(sig))
         sig  = sig + noise
         
         outModem = modem.bruteForceSeq(sig)
@@ -63,8 +79,8 @@ for i in np.arange(0, 15):
             nbPERErr = nbPERErr + 1
         nbBERErr = nbBERErr  + BERDiff(bs, bsout)
         
-    perList.append((dBRatio, nbPERErr/500))
-    berList.append((dBRatio, nbBERErr/(500*8)))
+    perList.append((dBRatio, nbPERErr/nbIter))
+    berList.append((dBRatio, nbBERErr/(nbIter*8)))
     
 fig, ax = plt.subplots()
 plt.ion()
